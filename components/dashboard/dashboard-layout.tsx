@@ -221,7 +221,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             )}
           >
             <Avatar className="w-10 h-10 shrink-0">
-              <AvatarImage src="/diverse-avatars.png" />
               <AvatarFallback className="bg-accent text-accent-foreground">
                 {userInitials}
               </AvatarFallback>
@@ -378,8 +377,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="lg:hidden">
                   <Avatar className="w-9 h-9">
-                    <AvatarImage src="/diverse-avatars.png" />
-                    <AvatarFallback>{userInitials}</AvatarFallback>
+                    <AvatarFallback className="bg-accent text-accent-foreground">
+                      {userInitials}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>

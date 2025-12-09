@@ -207,7 +207,7 @@ export default function SimulationDetailPage({
           </Card>
         </div>
 
-        {/* Graph and Detailed metrics side by side */}
+        {/* Graph and Performance Metrics side by side */}
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Queue Length Chart */}
           {waitTimeData.length > 0 && (
@@ -300,159 +300,160 @@ export default function SimulationDetailPage({
             </Card>
           )}
 
-          {/* Detailed metrics - beside the graph */}
-          <div className="space-y-6">
-            <Card className="rounded-xl border-border shadow-none">
-              <CardHeader>
-                <CardTitle className="text-base font-semibold">
-                  Performance Metrics
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">
-                    Avg Wait Time
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {performance_metrics?.avg_waiting_time?.toFixed(2) || "--"}{" "}
-                    min
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">
-                    Avg Service Time
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {performance_metrics?.avg_service_time?.toFixed(2) ||
-                      (performance_metrics as any)?.avg_dining_time?.toFixed(
-                        2
-                      ) ||
-                      "--"}{" "}
-                    min
-                  </span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-sm text-muted-foreground">
-                    Server Utilization
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {utilization_metrics?.server_utilization
-                      ? utilization_metrics.server_utilization > 1
-                        ? utilization_metrics.server_utilization.toFixed(1)
-                        : (
-                            utilization_metrics.server_utilization * 100
-                          ).toFixed(1)
-                      : "--"}
-                    %
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Performance Metrics - beside the graph */}
+          <Card className="rounded-xl border-border shadow-none">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold">
+                Performance Metrics
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-sm text-muted-foreground">
+                  Avg Wait Time
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {performance_metrics?.avg_waiting_time?.toFixed(2) || "--"}{" "}
+                  min
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-sm text-muted-foreground">
+                  Avg Service Time
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {performance_metrics?.avg_service_time?.toFixed(2) ||
+                    (performance_metrics as any)?.avg_dining_time?.toFixed(
+                      2
+                    ) ||
+                    "--"}{" "}
+                  min
+                </span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="text-sm text-muted-foreground">
+                  Server Utilization
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {utilization_metrics?.server_utilization
+                    ? utilization_metrics.server_utilization > 1
+                      ? utilization_metrics.server_utilization.toFixed(1)
+                      : (
+                          utilization_metrics.server_utilization * 100
+                        ).toFixed(1)
+                    : "--"}
+                  %
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            <Card className="rounded-xl border-border shadow-none">
-              <CardHeader>
-                <CardTitle className="text-base font-semibold">
-                  Queue & Customer Metrics
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">
-                    Avg Queue Length
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {queue_metrics?.queue_length_avg
-                      ? `${queue_metrics.queue_length_avg.toFixed(1)} customers`
-                      : "--"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">
-                    Max Queue Length
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {queue_metrics?.queue_length_max
-                      ? `${queue_metrics.queue_length_max} customers`
-                      : "--"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">
-                    Customers Served
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {customer_metrics?.customers_served
-                      ? `${customer_metrics.customers_served} customers`
-                      : "--"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-sm text-muted-foreground">
-                    Customers Lost
-                  </span>
-                  <span className="text-sm font-medium text-destructive">
-                    {customer_metrics?.customers_lost
-                      ? `${customer_metrics.customers_lost} customers`
-                      : "--"}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Queue & Customer Metrics and Simulation Configuration below the graph */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <Card className="rounded-xl border-border shadow-none">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold">
+                Queue & Customer Metrics
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-sm text-muted-foreground">
+                  Avg Queue Length
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {queue_metrics?.queue_length_avg
+                    ? `${queue_metrics.queue_length_avg.toFixed(1)} customers`
+                    : "--"}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-sm text-muted-foreground">
+                  Max Queue Length
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {queue_metrics?.queue_length_max
+                    ? `${queue_metrics.queue_length_max} customers`
+                    : "--"}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-sm text-muted-foreground">
+                  Customers Served
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {customer_metrics?.customers_served
+                    ? `${customer_metrics.customers_served} customers`
+                    : "--"}
+                </span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="text-sm text-muted-foreground">
+                  Customers Lost
+                </span>
+                <span className="text-sm font-medium text-destructive">
+                  {customer_metrics?.customers_lost
+                    ? `${customer_metrics.customers_lost} customers`
+                    : "--"}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="rounded-xl border-border shadow-none">
-              <CardHeader>
-                <CardTitle className="text-base font-semibold">
-                  Simulation Configuration
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">
-                    Number of Tables
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {config?.num_tables ? `${config.num_tables} tables` : "--"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">
-                    Number of Servers
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {config?.num_servers
-                      ? `${config.num_servers} servers`
-                      : "--"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">
-                    Customer Arrival Rate
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {config?.arrival_rate
-                      ? `${config.arrival_rate} customers/hr`
-                      : "--"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">
-                    Simulation Duration
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {config?.duration ? `${config.duration} minutes` : "--"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-sm text-muted-foreground">
-                    Queue Strategy
-                  </span>
-                  <Badge variant="secondary" className="rounded-full text-xs">
-                    {config?.queue_strategy || "FCFS"}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <Card className="rounded-xl border-border shadow-none">
+            <CardHeader>
+              <CardTitle className="text-base font-semibold">
+                Simulation Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-sm text-muted-foreground">
+                  Number of Tables
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {config?.num_tables ? `${config.num_tables} tables` : "--"}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-sm text-muted-foreground">
+                  Number of Servers
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {config?.num_servers
+                    ? `${config.num_servers} servers`
+                    : "--"}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-sm text-muted-foreground">
+                  Customer Arrival Rate
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {config?.arrival_rate
+                    ? `${config.arrival_rate} customers/hr`
+                    : "--"}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-border">
+                <span className="text-sm text-muted-foreground">
+                  Simulation Duration
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {config?.duration ? `${config.duration} minutes` : "--"}
+                </span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="text-sm text-muted-foreground">
+                  Queue Strategy
+                </span>
+                <Badge variant="secondary" className="rounded-full text-xs">
+                  {config?.queue_strategy || "FCFS"}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </DashboardLayout>
