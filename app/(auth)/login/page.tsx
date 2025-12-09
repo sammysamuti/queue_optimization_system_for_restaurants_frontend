@@ -31,10 +31,7 @@ export default function LoginPage() {
       await authService.login(formData)
       router.push("/dashboard")
     } catch (err: any) {
-      // Show more detailed error message
-      const errorMessage = err.message || err.response?.data?.detail || "Login failed. Please check your credentials."
-      setError(errorMessage)
-      console.error("Login error:", err)
+      setError(err.response?.data?.detail || "Login failed. Please check your credentials.")
     } finally {
       setIsLoading(false)
     }

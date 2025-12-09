@@ -26,13 +26,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Plus, Building2, MapPin, MoreHorizontal, Edit, Trash2, BarChart3, Clock, Users, Loader2 } from "lucide-react"
+import { Plus, Building2, MapPin, Edit, Trash2, Loader2 } from "lucide-react"
 import { useRestaurants } from "@/lib/hooks/use-restaurants"
+import { useSimulations } from "@/lib/hooks/use-simulations"
 import { toast } from "sonner"
 
 export function RestaurantsContent() {
   const router = useRouter()
-  const { restaurants, isLoading, createRestaurant, deleteRestaurant } = useRestaurants()
+  const { restaurants, isLoading, createRestaurant, updateRestaurant, deleteRestaurant } = useRestaurants()
+  const { simulations } = useSimulations()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [deleteId, setDeleteId] = useState<number | null>(null)
@@ -55,15 +57,25 @@ export function RestaurantsContent() {
     setIsSubmitting(true)
 
     try {
-      await createRestaurant({
-        ...formData,
-        location: formData.location || formData.address,
-      })
-      toast.success("Restaurant created successfully!")
+      if (editRestaurant) {
+        // Update existing restaurant
+        await updateRestaurant(editRestaurant.id, {
+          ...formData,
+          location: formData.location || formData.address,
+        })
+        toast.success("Restaurant updated successfully!")
+      } else {
+        // Create new restaurant
+        await createRestaurant({
+          ...formData,
+          location: formData.location || formData.address,
+        })
+        toast.success("Restaurant created successfully!")
+      }
       setIsDialogOpen(false)
       resetForm()
     } catch (error: any) {
-      toast.error(error.message || "Failed to create restaurant")
+      toast.error(error.message || `Failed to ${editRestaurant ? "update" : "create"} restaurant`)
     } finally {
       setIsSubmitting(false)
     }
@@ -102,13 +114,9 @@ export function RestaurantsContent() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Restaurants</h1>
-          <p className="text-muted-foreground">Manage your restaurant profiles</p>
-        </div>
+    <div className="space-y-6">
+      {/* Action button */}
+      <div className="flex justify-end">
         <Dialog
           open={isDialogOpen}
           onOpenChange={(open) => {
@@ -241,52 +249,58 @@ export function RestaurantsContent() {
       {/* Restaurant grid */}
       {restaurants.length > 0 && (
         <div className="grid md:grid-cols-2 gap-6">
-          {restaurants.map((restaurant) => (
-            <Card key={restaurant.id} className="rounded-2xl border-border hover:shadow-lg transition-shadow group">
-              <CardHeader className="flex flex-row items-start justify-between pb-3">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <Building2 className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">{restaurant.name}</CardTitle>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-                      <MapPin className="w-3 h-3" />
-                      <span>
-                        {restaurant.address || restaurant.location}, {restaurant.city}
-                      </span>
+          {restaurants.map((restaurant) => {
+            // Calculate stats from simulations for this restaurant
+            const restaurantSimulations = simulations.filter(
+              (sim) => (sim as any).restaurant === restaurant.id
+            )
+            const completedSims = restaurantSimulations.filter((s) => s.status === "completed")
+            const simCount = restaurantSimulations.length
+            const avgWaitTime =
+              completedSims.length > 0
+                ? completedSims.reduce((acc, s) => acc + (s.performance_metrics?.avg_waiting_time || 0), 0) /
+                  completedSims.length
+                : 0
+            // Get table count from most recent simulation config
+            const latestSim = restaurantSimulations[0]
+            const tableCount = latestSim?.config?.num_tables || "--"
+
+            return (
+              <Card key={restaurant.id} className="rounded-xl border-border shadow-none group">
+                <CardHeader className="flex flex-row items-start justify-between pb-3">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <Building2 className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{restaurant.name}</CardTitle>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                        <MapPin className="w-3 h-3" />
+                        <span>
+                          {restaurant.address || restaurant.location}, {restaurant.city}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-3 rounded-xl bg-secondary/50">
-                    <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
-                      <BarChart3 className="w-3 h-3" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center p-3 rounded-xl bg-secondary/50">
+                      <p className="text-lg font-semibold text-foreground">{simCount}</p>
+                      <p className="text-xs text-muted-foreground">Simulations</p>
                     </div>
-                    <p className="text-lg font-semibold text-foreground">--</p>
-                    <p className="text-xs text-muted-foreground">Simulations</p>
-                  </div>
-                  <div className="text-center p-3 rounded-xl bg-secondary/50">
-                    <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
-                      <Clock className="w-3 h-3" />
+                    <div className="text-center p-3 rounded-xl bg-secondary/50">
+                      <p className="text-lg font-semibold text-foreground">
+                        {completedSims.length > 0 ? `${avgWaitTime.toFixed(1)} min` : "--"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Avg Wait</p>
                     </div>
-                    <p className="text-lg font-semibold text-foreground">--</p>
-                    <p className="text-xs text-muted-foreground">Avg Wait</p>
-                  </div>
-                  <div className="text-center p-3 rounded-xl bg-secondary/50">
-                    <div className="flex items-center justify-center gap-1 text-muted-foreground mb-1">
-                      <Users className="w-3 h-3" />
+                    <div className="text-center p-3 rounded-xl bg-secondary/50">
+                      <p className="text-lg font-semibold text-foreground">{tableCount}</p>
+                      <p className="text-xs text-muted-foreground">Tables</p>
                     </div>
-                    <p className="text-lg font-semibold text-foreground">--</p>
-                    <p className="text-xs text-muted-foreground">Tables</p>
                   </div>
-                </div>
 
                 {/* Footer */}
                 <div className="flex items-center justify-between pt-2 border-t border-border">
@@ -316,7 +330,8 @@ export function RestaurantsContent() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            )
+          })}
         </div>
       )}
 

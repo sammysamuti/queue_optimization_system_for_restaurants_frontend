@@ -2,13 +2,10 @@
 
 import useSWR from "swr"
 import { simulationService, type SimulationResult, type RunSimulationRequest } from "@/lib/services/simulation-service"
-import { authService } from "@/lib/services/auth-service"
 
 export function useSimulations() {
-  const isAuthenticated = typeof window !== "undefined" && authService.isAuthenticated()
-  
   const { data, error, isLoading, mutate } = useSWR<SimulationResult[]>(
-    isAuthenticated ? "simulations" : null, // Only fetch if authenticated
+    "simulations",
     () => simulationService.getSimulations(),
     {
       revalidateOnFocus: false,

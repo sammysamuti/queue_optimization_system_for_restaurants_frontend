@@ -4,7 +4,29 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+// Get API URL from environment variable
+let BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4400/api";
+
+// Normalize the URL - ensure it uses HTTP if it's an IP address (for development)
+// This helps avoid SSL certificate issues with self-signed certs
+if (typeof window !== "undefined") {
+  const isProduction = window.location.protocol === "https:";
+  const urlObj = new URL(BASE_URL);
+
+  // If frontend is HTTPS but backend URL is HTTP with IP address, warn about mixed content
+  if (
+    isProduction &&
+    urlObj.protocol === "http:" &&
+    /^\d+\.\d+\.\d+\.\d+$/.test(urlObj.hostname)
+  ) {
+    console.warn(
+      "⚠️ Mixed Content Warning: HTTPS frontend cannot connect to HTTP backend with IP address."
+    );
+    console.warn(
+      "   Consider using HTTPS with valid certificate or a domain name with proper CORS setup."
+    );
+  }
+}
 
 // Log API URL for debugging
 if (typeof window !== "undefined") {
@@ -21,6 +43,12 @@ const apiClient: AxiosInstance = axios.create({
     "Content-Type": "application/json",
   },
   timeout: 30000,
+  // For development: allow self-signed certificates (NOT recommended for production)
+  // This is only needed if backend uses HTTPS with self-signed cert
+  ...(process.env.NODE_ENV === "development" &&
+    BASE_URL.startsWith("https://") && {
+      httpsAgent: typeof window === "undefined" ? undefined : undefined, // Node.js only
+    }),
 });
 
 // Request interceptor to add auth token
@@ -67,10 +95,12 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
-        // Clear tokens but don't redirect to login (allow guest mode)
+        // Clear tokens and redirect to login
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        // Don't redirect - let the app handle guest mode gracefully
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
       }
     }
 

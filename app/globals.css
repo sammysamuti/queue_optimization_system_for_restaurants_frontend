@@ -24,8 +24,8 @@
   --muted: oklch(0.96 0.005 250);
   --muted-foreground: oklch(0.45 0.01 250);
 
-  /* Accent - Emerald Green for success states */
-  --accent: oklch(0.72 0.17 155);
+  /* Accent - Light version of primary color for hover states */
+  --accent: oklch(0.85 0.15 25);
   --accent-foreground: oklch(1 0 0);
 
   --destructive: oklch(0.577 0.245 27.325);
@@ -68,7 +68,7 @@
   --secondary-foreground: oklch(0.95 0.005 250);
   --muted: oklch(0.2 0.015 265);
   --muted-foreground: oklch(0.65 0.01 250);
-  --accent: oklch(0.72 0.17 155);
+  --accent: oklch(0.85 0.15 25);
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.5 0.2 25);
   --destructive-foreground: oklch(1 0 0);

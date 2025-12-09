@@ -2,13 +2,10 @@
 
 import useSWR from "swr"
 import { restaurantService, type Restaurant, type CreateRestaurantRequest } from "@/lib/services/restaurant-service"
-import { authService } from "@/lib/services/auth-service"
 
 export function useRestaurants() {
-  const isAuthenticated = typeof window !== "undefined" && authService.isAuthenticated()
-  
   const { data, error, isLoading, mutate } = useSWR<Restaurant[]>(
-    isAuthenticated ? "restaurants" : null, // Only fetch if authenticated
+    "restaurants",
     () => restaurantService.getRestaurants(),
     {
       revalidateOnFocus: false,

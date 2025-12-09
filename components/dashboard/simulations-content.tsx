@@ -37,6 +37,7 @@ import { useRestaurants } from "@/lib/hooks/use-restaurants";
 import { useSimulations } from "@/lib/hooks/use-simulations";
 import { authService } from "@/lib/services/auth-service";
 import { toast } from "sonner";
+import { formatErrorMessage } from "@/lib/utils";
 
 export function SimulationsContent() {
   const router = useRouter();
@@ -112,7 +113,13 @@ export function SimulationsContent() {
         });
 
         toast.success("Simulation completed and saved!");
-        router.push(`/dashboard/simulations/${result.id}`);
+        const simulationId = (result as any).simulation_id || result.id;
+        if (simulationId) {
+          router.push(`/dashboard/simulations/${simulationId}`);
+        } else {
+          // If no ID, redirect to simulations list
+          router.push("/dashboard/simulations");
+        }
       } else {
         // Guest mode - run simulation without saving
         const simulationService = (
@@ -146,8 +153,9 @@ export function SimulationsContent() {
         setGuestResult(result);
         toast.success("Simulation completed! Login to save results.");
       }
-    } catch (error: any) {
-      toast.error(error.message || "Simulation failed. Please try again.");
+    } catch (error: unknown) {
+      const errorMessage = formatErrorMessage(error);
+      toast.error(errorMessage || "Simulation failed. Please try again.");
     } finally {
       setIsRunning(false);
     }

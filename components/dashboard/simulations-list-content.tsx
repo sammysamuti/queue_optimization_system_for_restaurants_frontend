@@ -32,13 +32,9 @@ export function SimulationsListContent() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Simulations</h1>
-          <p className="text-muted-foreground">View and manage all your simulation runs</p>
-        </div>
+    <div className="space-y-6">
+      {/* Action button */}
+      <div className="flex justify-end">
         <Button
           className="gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground"
           onClick={() => router.push("/dashboard/simulations/new")}
@@ -72,7 +68,7 @@ export function SimulationsListContent() {
 
       {/* Simulations table */}
       {simulations.length > 0 && (
-        <Card className="rounded-2xl border-border overflow-hidden">
+        <Card className="rounded-2xl border-border overflow-hidden shadow-none">
           <CardHeader>
             <CardTitle className="text-base font-semibold">All Simulations</CardTitle>
             <CardDescription>{simulations.length} total simulation(s)</CardDescription>
@@ -84,8 +80,8 @@ export function SimulationsListContent() {
                   <TableHead className="w-[200px]">Simulation ID</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Avg Wait Time</TableHead>
-                  <TableHead>Customers</TableHead>
-                  <TableHead>Utilization</TableHead>
+                  <TableHead>Customers Served</TableHead>
+                  <TableHead>Table Utilization</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
@@ -95,7 +91,7 @@ export function SimulationsListContent() {
                   <TableRow
                     key={sim.id}
                     className="cursor-pointer"
-                    onClick={() => router.push(`/dashboard/simulations/${sim.id}`)}
+                    onClick={() => router.push(`/dashboard/simulations/${sim.simulation_id || sim.id}`)}
                   >
                     <TableCell className="font-medium">#{sim.simulation_id?.slice(-8) || sim.id}</TableCell>
                     <TableCell>
@@ -114,10 +110,14 @@ export function SimulationsListContent() {
                       </Badge>
                     </TableCell>
                     <TableCell>{sim.performance_metrics?.avg_waiting_time?.toFixed(1) || "--"} min</TableCell>
-                    <TableCell>{sim.customer_metrics?.customers_served || "--"} served</TableCell>
+                    <TableCell>
+                      {sim.customer_metrics?.customers_served 
+                        ? `${sim.customer_metrics.customers_served} customers` 
+                        : "--"}
+                    </TableCell>
                     <TableCell>
                       {sim.utilization_metrics?.table_utilization
-                        ? `${Math.round(sim.utilization_metrics.table_utilization * 100)}%`
+                        ? `${Math.round((typeof sim.utilization_metrics.table_utilization === 'number' ? sim.utilization_metrics.table_utilization : parseFloat(sim.utilization_metrics.table_utilization)) * 100)}%`
                         : "--"}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
@@ -134,7 +134,7 @@ export function SimulationsListContent() {
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation()
-                              router.push(`/dashboard/simulations/${sim.id}`)
+                              router.push(`/dashboard/simulations/${sim.simulation_id || sim.id}`)
                             }}
                           >
                             <Eye className="w-4 h-4 mr-2" />

@@ -52,8 +52,23 @@ class AuthService {
       return response.data
     } catch (error: any) {
       // Better error handling
+      console.error("Login error:", error)
+      
+      // Check for SSL/certificate errors
+      if (error.message?.includes("ERR_CERT_AUTHORITY_INVALID") || 
+          error.message?.includes("certificate") ||
+          error.code === "CERT_AUTHORITY_INVALID") {
+        throw new Error("SSL Certificate Error: Backend is using an invalid or self-signed certificate. Please use HTTP or configure a valid SSL certificate.")
+      }
+      
+      // Check for mixed content errors
+      if (error.message?.includes("Mixed Content") || 
+          error.message?.includes("blocked:mixed-content")) {
+        throw new Error("Mixed Content Error: HTTPS frontend cannot connect to HTTP backend. Please configure backend to use HTTPS with a valid certificate.")
+      }
+      
       if (error.code === "ECONNREFUSED" || error.message?.includes("Network Error")) {
-        throw new Error("Cannot connect to backend server. Please check if the server is running.")
+        throw new Error("Cannot connect to backend server. Please check if the server is running and the API URL is correct.")
       }
       if (error.response?.status === 401) {
         throw new Error("Invalid username or password.")

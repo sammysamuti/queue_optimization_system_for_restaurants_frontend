@@ -83,9 +83,11 @@ export interface SimulationResult {
   queue_metrics: QueueMetrics;
   customer_metrics: CustomerMetrics;
   config?: RunSimulationRequest;
+  restaurant?: number; // Restaurant ID
   restaurant_name?: string;
   created_at: string;
   updated_at?: string;
+  queue_length_stats?: Array<{ time: number; queue_length: number }>; // For charts
 }
 
 class SimulationService {
@@ -208,19 +210,165 @@ class SimulationService {
   }
 
   async getSimulations(): Promise<SimulationResult[]> {
-    const response = await apiClient.get<SimulationResult[]>("/simulations/");
-    return response.data;
+    const response = await apiClient.get<any[]>("/simulations/");
+    // Transform API response to match frontend interface
+    return response.data.map((item: any) => {
+      const resultsSummary = item.results_summary || {};
+      const results = item.results || {};
+      
+      return {
+        id: item.id?.toString() || item.simulation_id,
+        simulation_id: item.simulation_id,
+        status: item.status,
+        performance_metrics: {
+          avg_waiting_time: resultsSummary.avg_waiting_time || results.performance_metrics?.avg_waiting_time || 0,
+          max_waiting_time: results.performance_metrics?.max_waiting_time || 0,
+          median_waiting_time: results.performance_metrics?.median_waiting_time || 0,
+          avg_service_time: results.performance_metrics?.avg_service_time || 0,
+          median_service_time: results.performance_metrics?.median_service_time || 0,
+          throughput: results.performance_metrics?.throughput || 0,
+        },
+        utilization_metrics: {
+          // table_utilization is already a percentage (54.81), not a decimal (0.5481)
+          table_utilization: resultsSummary.table_utilization 
+            ? (resultsSummary.table_utilization > 1 ? resultsSummary.table_utilization / 100 : resultsSummary.table_utilization)
+            : (results.utilization_metrics?.table_utilization 
+              ? (results.utilization_metrics.table_utilization > 1 ? results.utilization_metrics.table_utilization / 100 : results.utilization_metrics.table_utilization)
+              : 0),
+          server_utilization: results.utilization_metrics?.server_utilization 
+            ? (results.utilization_metrics.server_utilization > 1 ? results.utilization_metrics.server_utilization / 100 : results.utilization_metrics.server_utilization)
+            : 0,
+          peak_table_utilization: results.utilization_metrics?.peak_table_utilization || 0,
+          peak_server_utilization: results.utilization_metrics?.peak_server_utilization || 0,
+        },
+        queue_metrics: {
+          queue_length_avg: results.queue_metrics?.queue_length_avg || results.queue_length_stats?.reduce((acc: number, stat: any) => acc + stat.queue_length, 0) / (results.queue_length_stats?.length || 1) || 0,
+          queue_length_max: results.queue_metrics?.queue_length_max || Math.max(...(results.queue_length_stats?.map((stat: any) => stat.queue_length) || [0])) || 0,
+        },
+        customer_metrics: {
+          // customers_served is in performance_metrics in the API response
+          customers_served: resultsSummary.customers_served || results.performance_metrics?.customers_served || results.customer_metrics?.customers_served || 0,
+          customers_lost: results.performance_metrics?.customers_lost || results.customer_metrics?.customers_lost || 0,
+          total_customers_arrived: results.customer_metrics?.total_customers_arrived || 0,
+        },
+        config: item.config,
+        restaurant: item.restaurant, // Include restaurant ID for filtering
+        restaurant_name: item.restaurant_name,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+      };
+    });
   }
 
   async getSimulationById(id: string): Promise<SimulationResult> {
-    const response = await apiClient.get<SimulationResult>(
-      `/simulations/${id}/`
-    );
+    // Try by simulation_id first, then by numeric id
+    let response;
+    try {
+      response = await apiClient.get<any>(`/simulations/${id}/`);
+    } catch (error: any) {
+      // If not found, try to get by numeric id and then lookup simulation_id
+      if (error.response?.status === 404) {
+        // Get all simulations and find by id
+        const allSims = await this.getSimulations();
+        const sim = allSims.find(s => s.id === id || s.simulation_id === id);
+        if (sim) {
+          // Try again with simulation_id
+          response = await apiClient.get<any>(`/simulations/${sim.simulation_id}/`);
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
+    
+    const item = response.data;
+    const results = item.results || {};
+    const resultsSummary = item.results_summary || {};
+    
+    // Calculate queue metrics from queue_length_stats if available
+    const queueLengthStats = results.queue_length_stats || [];
+    const queueLengthAvg = queueLengthStats.length > 0
+      ? queueLengthStats.reduce((acc: number, stat: any) => acc + stat.queue_length, 0) / queueLengthStats.length
+      : 0;
+    const queueLengthMax = queueLengthStats.length > 0
+      ? Math.max(...queueLengthStats.map((stat: any) => stat.queue_length))
+      : 0;
+    
+    // Transform API response to match frontend interface
+    return {
+      id: item.id?.toString() || item.simulation_id,
+      simulation_id: item.simulation_id,
+      status: item.status,
+      performance_metrics: {
+        avg_waiting_time: results.performance_metrics?.avg_waiting_time || resultsSummary.avg_waiting_time || 0,
+        max_waiting_time: results.performance_metrics?.max_waiting_time || 0,
+        median_waiting_time: results.performance_metrics?.median_waiting_time || 0,
+        avg_service_time: results.performance_metrics?.avg_service_time || results.performance_metrics?.avg_dining_time || 0,
+        median_service_time: results.performance_metrics?.median_service_time || 0,
+        throughput: results.performance_metrics?.throughput || 0,
+      },
+      utilization_metrics: {
+        // table_utilization is already a percentage (54.81), not a decimal (0.5481)
+        table_utilization: results.utilization_metrics?.table_utilization 
+          ? (results.utilization_metrics.table_utilization > 1 ? results.utilization_metrics.table_utilization / 100 : results.utilization_metrics.table_utilization)
+          : (resultsSummary.table_utilization 
+            ? (resultsSummary.table_utilization > 1 ? resultsSummary.table_utilization / 100 : resultsSummary.table_utilization)
+            : 0),
+        server_utilization: results.utilization_metrics?.server_utilization 
+          ? (results.utilization_metrics.server_utilization > 1 ? results.utilization_metrics.server_utilization / 100 : results.utilization_metrics.server_utilization)
+          : 0,
+        peak_table_utilization: results.utilization_metrics?.peak_table_utilization || results.utilization_metrics?.peak_load || 0,
+        peak_server_utilization: results.utilization_metrics?.peak_server_utilization || 0,
+      },
+      queue_metrics: {
+        queue_length_avg: results.queue_metrics?.queue_length_avg || queueLengthAvg,
+        queue_length_max: results.queue_metrics?.queue_length_max || queueLengthMax,
+      },
+      customer_metrics: {
+        // customers_served is in performance_metrics in the API response
+        customers_served: results.performance_metrics?.customers_served || resultsSummary.customers_served || results.customer_metrics?.customers_served || 0,
+        customers_lost: results.performance_metrics?.customers_lost || results.customer_metrics?.customers_lost || 0,
+        total_customers_arrived: results.customer_metrics?.total_customers_arrived || 0,
+      },
+      config: item.config,
+      restaurant: item.restaurant, // Include restaurant ID for filtering
+      restaurant_name: item.restaurant_name,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      queue_length_stats: queueLengthStats, // Include for chart
+    };
+  }
+
+  async updateSimulation(id: string, data: Partial<{ status: string; error_message: string }>): Promise<SimulationResult> {
+    // The backend expects simulation_id, not numeric id
+    let simulationId = id;
+    if (/^\d+$/.test(id)) {
+      // It's a numeric id, get the simulation first
+      const sims = await this.getSimulations();
+      const sim = sims.find(s => s.id === id || s.simulation_id === id);
+      if (sim && sim.simulation_id) {
+        simulationId = sim.simulation_id;
+      }
+    }
+    const response = await apiClient.patch<SimulationResult>(`/simulations/${simulationId}/`, data);
     return response.data;
   }
 
   async deleteSimulation(id: string): Promise<void> {
-    await apiClient.delete(`/simulations/${id}/delete/`);
+    // The backend expects simulation_id, not numeric id
+    // If id looks like a number, we need to get the simulation_id first
+    let simulationId = id;
+    if (/^\d+$/.test(id)) {
+      // It's a numeric id, get the simulation first
+      const sims = await this.getSimulations();
+      const sim = sims.find(s => s.id === id || s.simulation_id === id);
+      if (sim && sim.simulation_id) {
+        simulationId = sim.simulation_id;
+      }
+    }
+    // Otherwise assume it's already a simulation_id
+    await apiClient.delete(`/simulations/${simulationId}/delete/`);
   }
 }
 
