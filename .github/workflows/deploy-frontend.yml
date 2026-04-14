@@ -1,4 +1,4 @@
-name: Deploy Queue Optimization System for Restaurants Frontend
+name: Deploy Queue Optimization System for Restaurants Frontend with Docker Compose
 
 on:
   push:
@@ -13,12 +13,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # NEW STEP: Set up the SSH agent using your existing secret key
-      - name: Install SSH Key
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
-
       - name: SSH into Server and Deploy Frontend
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -28,20 +22,15 @@ jobs:
           port: 22
           command_timeout: 25m
           timeout: 60s
-          # Add ssh_agent: true to pass the key through to the server
-          ssh_agent: true
           script: |
             set -euo pipefail
 
-            # 1. Setup Directory
+            # Define directory
             APP_DIR="$HOME/queue-frontend"
             mkdir -p "$APP_DIR"
             cd "$APP_DIR"
 
-            # 2. Add GitHub to known_hosts to prevent interactive prompts
-            ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-
-            # 3. Update Code via SSH
+            # Use HTTPS for cloning
             if [ ! -d ".git" ]; then 
               git clone -b main git@github.com:sammysamuti/queue_optimization_system_for_restaurants_frontend.git .
             else 
@@ -49,17 +38,15 @@ jobs:
               git reset --hard origin/main
             fi
 
-            # 4. Create Environment File
+            # REMOVED the 'cd queueopt-backend' line because your files are in the root
+
+            # Notice the quotes around 'EOF' - this is the magic fix
             cat <<'EOF' > .env
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             EOF
 
-            # 5. Deployment Sequence
-            docker compose -f docker-compose.dev.yml down --remove-orphans || true
+            # Deployment Sequence
+            docker compose down --remove-orphans || true
             docker image prune -f || true
-
-            echo "Building frontend containers..."
-            docker compose -f docker-compose.dev.yml build --no-cache
-
-            echo "Starting frontend..."
-            docker compose -f docker-compose.dev.yml up -d
+            docker compose build --no-cache
+            docker compose up -d
