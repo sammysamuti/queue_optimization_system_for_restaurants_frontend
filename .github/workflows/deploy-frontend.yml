@@ -1,4 +1,4 @@
-name: Deploy Queue Optimization System for Restaurants Frontend with Docker Compose
+name: Deploy Queue Optimization System for Restaurants Frontend
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: SSH into Server and Deploy Queue Optimization System for Restaurants Frontend
+      - name: SSH into Server and Deploy Frontend
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -25,23 +25,32 @@ jobs:
           script: |
             set -euo pipefail
 
-            # Define directory
+            # 1. Setup Directory
             APP_DIR="$HOME/queue-frontend"
             mkdir -p "$APP_DIR"
             cd "$APP_DIR"
 
-            # Use HTTPS for cloning
+            # 2. Update Code via HTTPS
             if [ ! -d ".git" ]; then 
               git clone -b main https://github.com/sammysamuti/queue_optimization_system_for_restaurants_frontend.git .
-            else git pull origin main; fi
+            else 
+              git fetch origin main
+              git reset --hard origin/main
+            fi
 
-            # Notice the quotes around 'EOF' - this is the magic fix
+            # 3. Create Environment File
+            # IMPORTANT: Ensure 'NEXT_PUBLIC_API_URL' is added to this Repo's Secrets
             cat <<'EOF' > .env
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             EOF
 
-            # Deployment Sequence
-            docker compose down --remove-orphans || true
+            # 4. Deployment Sequence
+            # Using -f docker-compose.dev.yml to match your file naming
+            docker compose -f docker-compose.dev.yml down --remove-orphans || true
             docker image prune -f || true
-            docker compose build --no-cache
-            docker compose up -d
+
+            echo "Building frontend containers..."
+            docker compose -f docker-compose.dev.yml build --no-cache
+
+            echo "Starting frontend..."
+            docker compose -f docker-compose.dev.yml up -d
