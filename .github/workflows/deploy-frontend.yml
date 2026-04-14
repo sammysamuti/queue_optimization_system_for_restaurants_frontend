@@ -25,28 +25,30 @@ jobs:
           script: |
             set -euo pipefail
 
-            # Define directory
-            APP_DIR="$HOME/queue-frontend"
+            APP_DIR="/app/queue-frontend"
             mkdir -p "$APP_DIR"
             cd "$APP_DIR"
 
-            # Use HTTPS for cloning
-            if [ ! -d ".git" ]; then 
-              git clone -b main https://github.com/sammysamuti/queue_optimization_system_for_restaurants_frontend.git .
-            else 
-              git fetch origin main
-              git reset --hard origin/main
-            fi
+            # avoid first-time GitHub host prompt
+            mkdir -p "$HOME/.ssh"
+            touch "$HOME/.ssh/known_hosts"
+            grep -q github.com "$HOME/.ssh/known_hosts" || ssh-keyscan -t ed25519 github.com >> "$HOME/.ssh/known_hosts"
 
-            # REMOVED the 'cd queueopt-backend' line because your files are in the root
+            # clone OR pull in one command (SSH; same pattern as sms-portal deploy)
+            if [ ! -d ".git" ]; then git clone -b main git@github.com:sammysamuti/queue_optimization_system_for_restaurants_frontend.git .; else git pull origin main; fi
 
-            # Notice the quotes around 'EOF' - this is the magic fix
-            cat <<'EOF' > .env
+            # build stamp
+            mkdir -p build/web
+            date +%s > build/web/version.json
+
+            # Recreate .env file
+            cat <<EOF > .env
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             EOF
 
-            # Deployment Sequence
-            docker compose down --remove-orphans || true
+            # docker compose v2
+            docker compose -f docker-compose.yml down || true
             docker image prune -f || true
-            docker compose build --no-cache
-            docker compose up -d
+            docker builder prune -f || true
+            docker compose -f docker-compose.yml build
+            docker compose -f docker-compose.yml up -d
