@@ -51,23 +51,7 @@ jobs:
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             EOF
 
-            echo "6. checking docker"
-            docker --version
-            docker compose version
 
-            echo "7. compose down"
-            docker compose -f docker-compose.yml down || true
-
-            echo "8. image prune"
-            docker image prune -f || true
-
-            echo "9. builder prune"
-            docker builder prune -f || true
-
-            echo "10. compose build"
-            docker compose -f docker-compose.yml build --progress plain
-
-            echo "11. compose up"
-            docker compose -f docker-compose.yml up -d
+            docker compose  -f docker-compose.yml up -d --build
 
             echo "12. done"
