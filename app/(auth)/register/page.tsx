@@ -56,7 +56,7 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md rounded-2xl border-border">
+        <Card className="w-full max-w-md rounded-2xl">
           <CardContent className="pt-8 pb-8 text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto">
               <Check className="w-8 h-8 text-accent" />
@@ -79,7 +79,7 @@ export default function RegisterPage() {
         <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
       </div>
 
-      <Card className="w-full max-w-md rounded-2xl border-border relative z-10">
+      <Card className="w-full max-w-md rounded-2xl relative z-10">
         <CardHeader className="text-center space-y-4 pb-2">
           <Link href="/" className="inline-flex items-center justify-center gap-3 mx-auto">
             <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">

@@ -43,13 +43,13 @@ export function AnalyticsContent() {
   return (
     <div className="space-y-6">
       {/* Results table - moved to top */}
-      <Card className="rounded-xl border-border shadow-none">
+      <Card className="rounded-xl shadow-none">
         <CardHeader>
           <CardTitle className="text-base font-semibold">Simulation Results</CardTitle>
           <CardDescription>Detailed results from all simulations</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-xl border border-border overflow-hidden">
+          <div className="rounded-xl overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow className="bg-secondary/50 hover:bg-secondary/50">
@@ -128,7 +128,7 @@ export function AnalyticsContent() {
 
       {/* Performance trends chart - only if we have data */}
       {performanceData.length > 0 && (
-        <Card className="rounded-xl border-border shadow-none">
+        <Card className="rounded-xl shadow-none">
           <CardHeader>
             <CardTitle className="text-base font-semibold">Performance Trends</CardTitle>
             <CardDescription>Average wait time and table utilization over time</CardDescription>

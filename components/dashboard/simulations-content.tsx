@@ -201,7 +201,7 @@ export function SimulationsContent() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Configuration panel */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="rounded-2xl border-border">
+          <Card className="rounded-2xl">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Settings2 className="w-5 h-5 text-primary" />
@@ -405,7 +405,7 @@ export function SimulationsContent() {
           </Card>
 
           {/* Party size distribution */}
-          <Card className="rounded-2xl border-border">
+          <Card className="rounded-2xl">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
@@ -445,7 +445,7 @@ export function SimulationsContent() {
 
         {/* Run panel */}
         <div className="space-y-6">
-          <Card className="rounded-2xl border-border sticky top-24">
+          <Card className="rounded-2xl sticky top-24">
             <CardHeader>
               <CardTitle className="text-lg">Run Simulation</CardTitle>
               <CardDescription>
@@ -571,7 +571,7 @@ export function SimulationsContent() {
           </Card>
 
           {/* Recent runs */}
-          <Card className="rounded-2xl border-border">
+          <Card className="rounded-2xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium">Recent Runs</CardTitle>
             </CardHeader>

@@ -445,7 +445,7 @@ export function LandingPage() {
       <section id="simulator" className="py-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Scenario Selection */}
-          <Card className="mb-6 border-border">
+          <Card className="mb-6">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <Sparkles className="w-4 h-4" />
@@ -497,7 +497,7 @@ export function LandingPage() {
           <div className="grid lg:grid-cols-[280px_1fr] gap-6">
             {/* Left Sidebar - Configuration */}
             <div className="space-y-4">
-              <Card className="border-border">
+              <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <Settings className="w-4 h-4" />
@@ -627,7 +627,7 @@ export function LandingPage() {
               </Card>
 
               {/* Quick Reference */}
-              <Card className="border-border">
+              <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-semibold">INPUT PARAMETERS</CardTitle>
                 </CardHeader>
@@ -667,7 +667,7 @@ export function LandingPage() {
             {/* Main Content Area */}
             <div className="space-y-4">
               {/* Instructions */}
-              <Card className="border-border">
+              <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
                     <Info className="w-4 h-4" />
@@ -698,7 +698,7 @@ export function LandingPage() {
 
               {/* Results Section */}
               {result ? (
-                <Card className="border-border">
+                <Card>
                   <CardHeader className="pb-3 flex flex-row items-center justify-between">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <Activity className="w-4 h-4" />
@@ -990,7 +990,7 @@ export function LandingPage() {
                   </CardContent>
                 </Card>
               ) : (
-                <Card className="border-border border-dashed">
+                <Card>
                   <CardContent className="py-16 text-center">
                     <Activity className="w-12 h-12 mx-auto text-muted-foreground/50 mb-4" />
                     <p className="text-sm font-medium text-muted-foreground">No simulation results yet</p>
@@ -1008,7 +1008,7 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-xl font-bold text-foreground mb-6">Methodology</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            <Card className="border-border">
+            <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold">M/M/c Queuing Model</CardTitle>
               </CardHeader>
@@ -1025,7 +1025,7 @@ export function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-border">
+            <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold">Key Formulas</CardTitle>
               </CardHeader>
@@ -1047,7 +1047,7 @@ export function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-border">
+            <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold">Assumptions</CardTitle>
               </CardHeader>

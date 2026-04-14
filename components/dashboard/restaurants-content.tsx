@@ -226,7 +226,7 @@ export function RestaurantsContent() {
 
       {/* Empty state */}
       {restaurants.length === 0 && (
-        <Card className="rounded-2xl border-border">
+        <Card className="rounded-2xl">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <Building2 className="w-8 h-8 text-primary" />
@@ -266,7 +266,7 @@ export function RestaurantsContent() {
             const tableCount = latestSim?.config?.num_tables || "--"
 
             return (
-              <Card key={restaurant.id} className="rounded-xl border-border shadow-none group">
+              <Card key={restaurant.id} className="rounded-xl shadow-none group">
                 <CardHeader className="flex flex-row items-start justify-between pb-3">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">

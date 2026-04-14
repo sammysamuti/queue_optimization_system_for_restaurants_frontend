@@ -86,7 +86,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
 
         {/* Stats cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="rounded-2xl border-border">
+          <Card className="rounded-2xl">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -99,7 +99,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-2xl border-border">
+          <Card className="rounded-2xl">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
@@ -112,7 +112,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-2xl border-border">
+          <Card className="rounded-2xl">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-chart-3/10 flex items-center justify-center">
@@ -125,7 +125,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-2xl border-border">
+          <Card className="rounded-2xl">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-chart-4/10 flex items-center justify-center">
@@ -141,7 +141,7 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         </div>
 
         {/* Simulations list */}
-        <Card className="rounded-2xl border-border">
+        <Card className="rounded-2xl">
           <CardHeader>
             <CardTitle>Simulation History</CardTitle>
             <CardDescription>All simulations run for this restaurant</CardDescription>

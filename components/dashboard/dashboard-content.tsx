@@ -98,7 +98,7 @@ export function DashboardContent() {
       {/* Charts row - only real data */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Utilization card - real data only */}
-        <Card className="rounded-xl border-border shadow-none">
+        <Card className="rounded-xl shadow-none">
           <CardContent className="p-6">
             <h3 className="text-base font-semibold mb-4">Resource Utilization</h3>
             <div className="space-y-4">
@@ -124,7 +124,7 @@ export function DashboardContent() {
         </Card>
 
         {/* Recent simulations - real data only */}
-        <Card className="rounded-xl border-border shadow-none">
+        <Card className="rounded-xl shadow-none">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold">Recent Simulations</h3>
@@ -202,7 +202,7 @@ function MetricCard({
   isLoading?: boolean
 }) {
   return (
-    <Card className="rounded-xl border-border shadow-none">
+    <Card className="rounded-xl shadow-none">
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div className="space-y-2">

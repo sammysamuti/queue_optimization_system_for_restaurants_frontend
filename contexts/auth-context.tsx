@@ -24,6 +24,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const fetchUser = async () => {
       try {
         if (authService.isAuthenticated()) {
+          const cached = authService.getCachedUserProfile()
+          if (cached) setUser(cached)
           const userData = await authService.getCurrentUser()
           setUser(userData)
         }

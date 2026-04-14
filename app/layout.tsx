@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Poppins, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/contexts/theme-context"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
@@ -41,7 +40,6 @@ export default function RootLayout({
           {children}
           <Toaster position="top-right" richColors />
         </ThemeProvider>
-        <Analytics />
       </body>
     </html>
   )

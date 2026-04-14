@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  queue-opt-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    container_name: queue-opt-frontend-app
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    restart: unless-stopped
+    networks:
+      - queue-opt-network
+
+networks:
+  queue-opt-network:
+    driver: bridge

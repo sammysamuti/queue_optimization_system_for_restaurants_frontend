@@ -1,5 +1,7 @@
 import apiClient from "@/lib/api/client"
 
+const USER_PROFILE_CACHE_KEY = "userProfile"
+
 // Types
 export interface RegisterRequest {
   username: string
@@ -48,6 +50,14 @@ class AuthService {
       if (typeof window !== "undefined") {
         localStorage.setItem("accessToken", response.data.access)
         localStorage.setItem("refreshToken", response.data.refresh)
+        try {
+          localStorage.setItem(
+            USER_PROFILE_CACHE_KEY,
+            JSON.stringify(response.data.user)
+          )
+        } catch {
+          /* ignore cache write errors */
+        }
       }
       return response.data
     } catch (error: any) {
@@ -92,13 +102,36 @@ class AuthService {
 
   async getCurrentUser(): Promise<User> {
     const response = await apiClient.get<User>("/auth/me/")
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(
+          USER_PROFILE_CACHE_KEY,
+          JSON.stringify(response.data)
+        )
+      } catch {
+        /* ignore */
+      }
+    }
     return response.data
+  }
+
+  /** Last known profile from login/me; use when hydrating UI before network. */
+  getCachedUserProfile(): User | null {
+    if (typeof window === "undefined") return null
+    try {
+      const raw = localStorage.getItem(USER_PROFILE_CACHE_KEY)
+      if (!raw) return null
+      return JSON.parse(raw) as User
+    } catch {
+      return null
+    }
   }
 
   logout(): void {
     if (typeof window !== "undefined") {
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
+      localStorage.removeItem(USER_PROFILE_CACHE_KEY)
     }
   }
 

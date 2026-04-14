@@ -32,7 +32,7 @@ import {
   User,
 } from "lucide-react";
 import { useTheme } from "@/contexts/theme-context";
-import { authService } from "@/lib/services/auth-service";
+import { authService, type User } from "@/lib/services/auth-service";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -103,29 +103,27 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { theme, toggleTheme } = useTheme();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<{ username: string; email: string } | null>(
-    null
-  );
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Check auth and get user (optional - allow guest access)
     const fetchUser = async () => {
+      if (!authService.isAuthenticated()) {
+        setUser(null);
+        return;
+      }
+      const cached = authService.getCachedUserProfile();
+      if (cached) {
+        setUser(cached);
+      }
       try {
-        if (authService.isAuthenticated()) {
-          const userData = await authService.getCurrentUser();
-          setUser(userData);
-        } else {
-          setUser(null); // Guest mode
-        }
+        const userData = await authService.getCurrentUser();
+        setUser(userData);
       } catch {
-        setUser(null); // Guest mode on error
-      } finally {
-        setIsLoading(false);
+        if (!cached) setUser(null);
       }
     };
-    fetchUser();
-  }, [router]);
+    void fetchUser();
+  }, []);
 
   const handleLogout = () => {
     authService.logout();

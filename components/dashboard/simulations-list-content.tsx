@@ -46,7 +46,7 @@ export function SimulationsListContent() {
 
       {/* Empty state */}
       {simulations.length === 0 && (
-        <Card className="rounded-2xl border-border">
+        <Card className="rounded-2xl">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <BarChart3 className="w-8 h-8 text-primary" />
@@ -68,7 +68,7 @@ export function SimulationsListContent() {
 
       {/* Simulations table */}
       {simulations.length > 0 && (
-        <Card className="rounded-2xl border-border overflow-hidden shadow-none">
+        <Card className="rounded-2xl overflow-hidden shadow-none">
           <CardHeader>
             <CardTitle className="text-base font-semibold">All Simulations</CardTitle>
             <CardDescription>{simulations.length} total simulation(s)</CardDescription>

@@ -1,0 +1,54 @@
+name: Deploy Queue Optimization System for Restaurants Frontend with Docker Compose
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-main:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: SSH into Server and Deploy Queue Optimization System for Restaurants Frontend
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.PROD_SERVER_HOST }}
+          username: ${{ secrets.PROD_SERVER_USER }}
+          key: ${{ secrets.PROD_SERVER_SSH_KEY }}
+          port: 22
+          command_timeout: 25m
+          timeout: 60s
+          script: |
+            set -euo pipefail
+
+            APP_DIR="/app/queue-optimization-system-for-restaurants-frontend"
+            mkdir -p "$APP_DIR"
+            cd "$APP_DIR"
+
+            # avoid first-time GitHub host prompt
+            mkdir -p "$HOME/.ssh"
+            touch "$HOME/.ssh/known_hosts"
+            grep -q github.com "$HOME/.ssh/known_hosts" || ssh-keyscan -t ed25519 github.com >> "$HOME/.ssh/known_hosts"
+
+            # clone OR pull in one command
+            if [ ! -d ".git" ]; then git clone -b main git@github.com:sammysamuti/queue_optimization_system_for_restaurants_frontend.git .; else git pull origin main; fi
+
+            # build stamp
+            mkdir -p build/web
+            date +%s > build/web/version.json
+
+            # Recreate .env file
+            cat <<EOF > .env
+            NEXT_PUBLIC_API_URL=${{ secrets.PROD_NEXT_PUBLIC_API_URL }}
+            EOF
+
+            # docker compose v2
+            docker compose -f docker-compose.dev.yml down || true
+            docker image prune -f || true
+            docker builder prune -f || true
+            docker compose -f docker-compose.dev.yml build
+            docker compose -f docker-compose.dev.yml up -d

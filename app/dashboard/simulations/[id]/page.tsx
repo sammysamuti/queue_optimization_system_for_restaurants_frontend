@@ -130,7 +130,7 @@ export default function SimulationDetailPage({
 
         {/* Key metrics */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="rounded-xl border-border shadow-none">
+          <Card className="rounded-xl shadow-none">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -146,7 +146,7 @@ export default function SimulationDetailPage({
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-xl border-border shadow-none">
+          <Card className="rounded-xl shadow-none">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
@@ -163,7 +163,7 @@ export default function SimulationDetailPage({
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-xl border-border shadow-none">
+          <Card className="rounded-xl shadow-none">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-chart-3/10 flex items-center justify-center">
@@ -188,7 +188,7 @@ export default function SimulationDetailPage({
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-xl border-border shadow-none">
+          <Card className="rounded-xl shadow-none">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
@@ -211,7 +211,7 @@ export default function SimulationDetailPage({
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Queue Length Chart */}
           {waitTimeData.length > 0 && (
-            <Card className="lg:col-span-2 rounded-xl border-border shadow-none">
+            <Card className="lg:col-span-2 rounded-xl shadow-none">
               <CardHeader>
                 <CardTitle className="text-base font-semibold">
                   Queue Length Over Time
@@ -301,7 +301,7 @@ export default function SimulationDetailPage({
           )}
 
           {/* Performance Metrics - beside the graph */}
-          <Card className="rounded-xl border-border shadow-none">
+          <Card className="rounded-xl shadow-none">
             <CardHeader>
               <CardTitle className="text-base font-semibold">
                 Performance Metrics
@@ -351,7 +351,7 @@ export default function SimulationDetailPage({
 
         {/* Queue & Customer Metrics and Simulation Configuration below the graph */}
         <div className="grid lg:grid-cols-2 gap-6">
-          <Card className="rounded-xl border-border shadow-none">
+          <Card className="rounded-xl shadow-none">
             <CardHeader>
               <CardTitle className="text-base font-semibold">
                 Queue & Customer Metrics
@@ -401,7 +401,7 @@ export default function SimulationDetailPage({
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border shadow-none">
+          <Card className="rounded-xl shadow-none">
             <CardHeader>
               <CardTitle className="text-base font-semibold">
                 Simulation Configuration
