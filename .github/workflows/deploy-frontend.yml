@@ -18,37 +18,56 @@ jobs:
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}    
+          key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           command_timeout: 25m
           timeout: 60s
           script: |
             set -euo pipefail
 
+            echo "1. connected"
             APP_DIR="/app/queue-frontend"
             mkdir -p "$APP_DIR"
             cd "$APP_DIR"
 
-            # avoid first-time GitHub host prompt
+            echo "2. preparing ssh"
             mkdir -p "$HOME/.ssh"
             touch "$HOME/.ssh/known_hosts"
             grep -q github.com "$HOME/.ssh/known_hosts" || ssh-keyscan -t ed25519 github.com >> "$HOME/.ssh/known_hosts"
 
-            # clone OR pull in one command
-            if [ ! -d ".git" ]; then git clone -b main git@github.com:sammysamuti/queue_optimization_system_for_restaurants_frontend.git .; else git pull origin main; fi
+            echo "3. syncing repo"
+            if [ ! -d ".git" ]; then
+              git clone -b main git@github.com:sammysamuti/queue_optimization_system_for_restaurants_frontend.git .
+            else
+              git pull origin main
+            fi
 
-            # build stamp
+            echo "4. writing build stamp"
             mkdir -p build/web
             date +%s > build/web/version.json
-        
-            # Recreate .env file
+
+            echo "5. writing env"
             cat <<EOF > .env
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             EOF
 
-            # docker compose v2
+            echo "6. checking docker"
+            docker --version
+            docker compose version
+
+            echo "7. compose down"
             docker compose -f docker-compose.yml down || true
+
+            echo "8. image prune"
             docker image prune -f || true
+
+            echo "9. builder prune"
             docker builder prune -f || true
-            docker compose -f docker-compose.yml build
+
+            echo "10. compose build"
+            docker compose -f docker-compose.yml build --progress plain
+
+            echo "11. compose up"
             docker compose -f docker-compose.yml up -d
+
+            echo "12. done"
