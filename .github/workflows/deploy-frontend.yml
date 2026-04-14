@@ -13,6 +13,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # NEW STEP: Set up the SSH agent using your existing secret key
+      - name: Install SSH Key
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
       - name: SSH into Server and Deploy Frontend
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -22,6 +28,8 @@ jobs:
           port: 22
           command_timeout: 25m
           timeout: 60s
+          # Add ssh_agent: true to pass the key through to the server
+          ssh_agent: true
           script: |
             set -euo pipefail
 
@@ -30,7 +38,10 @@ jobs:
             mkdir -p "$APP_DIR"
             cd "$APP_DIR"
 
-            # 2. Update Code via HTTPS
+            # 2. Add GitHub to known_hosts to prevent interactive prompts
+            ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+            # 3. Update Code via SSH
             if [ ! -d ".git" ]; then 
               git clone -b main git@github.com:sammysamuti/queue_optimization_system_for_restaurants_frontend.git .
             else 
@@ -38,14 +49,12 @@ jobs:
               git reset --hard origin/main
             fi
 
-            # 3. Create Environment File
-            # IMPORTANT: Ensure 'NEXT_PUBLIC_API_URL' is added to this Repo's Secrets
+            # 4. Create Environment File
             cat <<'EOF' > .env
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             EOF
 
-            # 4. Deployment Sequence
-            # Using -f docker-compose.dev.yml to match your file naming
+            # 5. Deployment Sequence
             docker compose -f docker-compose.dev.yml down --remove-orphans || true
             docker image prune -f || true
 
