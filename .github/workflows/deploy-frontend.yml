@@ -1,4 +1,4 @@
-name: Deploy Queue Optimization System for Restaurants Frontend with Docker Compose
+name: Deploy Queue-Optimization System for Restaurants Frontend with Docker Compose
 
 on:
   push:
